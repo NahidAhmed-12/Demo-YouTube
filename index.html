@@ -10,6 +10,13 @@
       margin: 10px;
       border: 1px solid #ccc;
     }
+    .loading {
+      border: 1px solid #ff9800;
+      background-color: #fff3e0;
+    }
+    .loaded {
+      border: 1px solid #4caf50;
+    }
   </style>
 </head>
 <body>
@@ -36,11 +43,32 @@ function loadSite() {
 
   container.innerHTML = ''; // আগে যা ছিল সব মুছে ফেলবে
 
-  for (let i = 0; i < count; i++) {
+  // একটি Queue তৈরি করছি iframe গুলো ধাপে ধাপে লোড করার জন্য
+  let currentIndex = 0;
+  
+  function loadNextIframe() {
+    if (currentIndex >= count) return;
+    
     const iframe = document.createElement('iframe');
+    iframe.className = 'loading';
     iframe.src = link;
     container.appendChild(iframe);
+    
+    iframe.onload = function() {
+      iframe.className = 'loaded';
+      currentIndex++;
+      loadNextIframe();
+    };
+    
+    iframe.onerror = function() {
+      iframe.className = 'error';
+      currentIndex++;
+      loadNextIframe();
+    };
   }
+  
+  // প্রথম iframe লোড শুরু করছি
+  loadNextIframe();
 }
 </script>
 
